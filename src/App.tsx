@@ -1,24 +1,22 @@
 import React from 'react';
-import logo from './logo.svg';
+ import {getDatabase ,ref,set} from "firebase/database"
+//  import {app} from "../src/firebase"
 import './App.css';
-
+import {BrowserRouter,Routes,Route} from "react-router-dom";
+import Signup from './pages/Signup';
+import Signin from '../src/pages/Signin'
+// const db = getDatabase(app);
 function App() {
+  
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+         <BrowserRouter>
+ <Routes>
+        <Route element={<Signup/>} path="/"/>
+      <Route element={<Signin/>} path="/Signin"/>
+      {/* <Route element={<Home/>} path="/Signin/Home"/> */}
+      </Routes>
+      </BrowserRouter>
     </div>
   );
 }
