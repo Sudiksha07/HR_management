@@ -1,0 +1,41 @@
+.sidebar{
+    position: absolute;
+    height:90vh;
+    left:0;
+    background-color: #353444;
+    width: 250px;
+    top:64px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items:center;
+}
+.menuItems{
+    padding:12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 226px;
+}
+.menuItem{
+    color:white;
+}
+.menuItems:hover{
+    background-color: #52b1ff;
+}
+.menuItems:hover .menuItem,
+.menuItems:hover .menuIcon {
+  color: white
+}
+.menuIcon{
+    color:white;
+    margin:0px 5px;
+}
+.menuItems.selected {
+    background-color:#52b1ff;
+}
+.menuItems.selected .menuItem,
+.menuItems.selected .menuIcon {
+  color: white
+}
