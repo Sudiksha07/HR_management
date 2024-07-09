@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./index.css";
+import "./sidebar.css";
 import PeopleIcon from "@mui/icons-material/People";
 import AutoAwesomeMotionIcon from "@mui/icons-material/AutoAwesomeMotion";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
@@ -17,7 +17,6 @@ const SideBar = () => {
 
   return (
     <div className="sidebar">
-      
       {menuItems.map((item, id) => {
         const Icon = item.icon;
         const isSelected = selectedItem === id;

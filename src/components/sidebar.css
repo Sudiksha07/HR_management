@@ -2,7 +2,7 @@
     position: absolute;
     height:90vh;
     left:0;
-    background-color: #353444;
+    background-color: rgb(39 39 42);
     width: 250px;
     top:64px;
     display: flex;
@@ -22,7 +22,9 @@
     color:white;
 }
 .menuItems:hover{
-    background-color: #52b1ff;
+    background-color: rgb(31 41 55);
+    border-radius:0px 20px 20px 0px;
+    border: solid white 3px;
 }
 .menuItems:hover .menuItem,
 .menuItems:hover .menuIcon {
@@ -33,7 +35,9 @@
     margin:0px 5px;
 }
 .menuItems.selected {
-    background-color:#52b1ff;
+    background-color:rgb(31 41 55);
+    border-radius:0px 20px 20px 0px;
+    border: solid white 3px;
 }
 .menuItems.selected .menuItem,
 .menuItems.selected .menuIcon {
