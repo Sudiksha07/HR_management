@@ -2,16 +2,22 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import {FirebaseProvider} from "../src/context/Firebase"
+import {  AuthProvider } from './context/Firebase';
+//import {FirebaseProvider} from "../src/context/Firebase"
+// import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+
+// import Employee from './pages/Employee';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <FirebaseProvider>
-    <App />
-    </FirebaseProvider>
+    {/* <FirebaseProvider> */}
+    <AuthProvider>
+    <App/>
+    {/* </FirebaseProvider> */}
+    </AuthProvider>
   </React.StrictMode>
 );
 
