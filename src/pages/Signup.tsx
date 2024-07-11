@@ -70,14 +70,14 @@ import '../pages/Signup.css';
 
 // export default Signup;
 import React, { useState, FormEvent } from 'react';
-import { useAuth } from '../context/Firebase';
+import { useFirebase } from '../context/Firebase';
  import { Link, useNavigate } from 'react-router-dom';
 // import '../pages/signup.css';
 
 const Signup: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signup } = useAuth();
+  const { signup } = useFirebase();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {

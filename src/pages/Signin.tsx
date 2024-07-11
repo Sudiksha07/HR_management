@@ -69,13 +69,13 @@
 // export default Signin;
 import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/Firebase';
+import { useFirebase } from '../context/Firebase';
 // import '../pages/signin.css'
 
 const Signin: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signin } = useAuth();
+  const { signin } = useFirebase();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {

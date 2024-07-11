@@ -1,116 +1,90 @@
-
-// src/context/FirebaseContext.tsx
-// import React, { createContext, useContext, ReactNode } from 'react';
-// import { initializeApp } from 'firebase/app';
-// import { getFirestore } from 'firebase/firestore';
-// import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-// import { getDatabase, ref, set, update, remove } from 'firebase/database';
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyDA8HAyGsfcRIRFP37a4CeMwhN5NLQeYIU",
-//   authDomain: "hrmanagament-b6c14.firebaseapp.com",
-//   projectId: "hrmanagament-b6c14",
-//   storageBucket: "hrmanagament-b6c14.appspot.com",
-//   messagingSenderId: "55444164972",
-//   appId: "1:55444164972:web:b515c28b1c1b65c044e349",
-//   // databaseURL: "https://hrmanagament-b6c14-default-rtdb.firebaseio.com"
-// };
-// const app = initializeApp(firebaseConfig);
-// const firebaseApp = initializeApp(firebaseConfig);
-// const database = getFirestore(app);
-// const auth = getAuth(app);
-
-// // Define the type for Firebase context
-// interface FirebaseContextType {
-//   putData: (key: string, data: any) => Promise<void>;
-//   updateData: (key: string, data: any) => Promise<void>;
-//   deleteData: (key: string) => Promise<void>;
-// }
-
-// // Create a context object with initial value undefined
-// const FirebaseContext = createContext<FirebaseContextType | undefined>(undefined);
-
-// // Custom hook to consume Firebase context
-// export const useFirebase = (): FirebaseContextType => {
-//   const context = useContext(FirebaseContext);
-//   if (!context) {
-//     throw new Error('useFirebase must be used within a FirebaseProvider');
-//   }
-//   return context;
-// };
-
-// // Props for FirebaseProvider component
-// interface FirebaseProviderProps {
-//   children: ReactNode;
-// }
-
-// // FirebaseProvider component to provide Firebase context to the app
-// export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ children }) => {
-//   // Functions to interact with Firebase database
-//   const putData = async (key: string, data: any) => {
-//     await set(ref(database, key), data);
-//   };
-
-//   const updateData = async (key: string, data: any) => {
-//     await update(ref(database, key), data);
-//   };
-
-//   const deleteData = async (key: string) => {
-//     await remove(ref(database, key));
-//   };
-
-//   // Provide the context value to its children components
-//   return (
-//     <FirebaseContext.Provider value={{ putData, updateData, deleteData }}>
-//       {children}
-//     </FirebaseContext.Provider>
-//   );
-// };
-// firebaseConfig.js
-import React, { createContext, useContext, useState, useEffect, ReactNode, FormEvent } from 'react';
-import { initializeApp } from 'firebase/app';
-import { getAuth, User, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  User,
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import {
+  getFirestore,
+  doc,
+  addDoc,
+  getDoc,
+  collection,
+  getDocs,
+} from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./authContext";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDA8HAyGsfcRIRFP37a4CeMwhN5NLQeYIU",
-    authDomain: "hrmanagament-b6c14.firebaseapp.com",
-    projectId: "hrmanagament-b6c14",
-    storageBucket: "hrmanagament-b6c14.appspot.com",
-    messagingSenderId: "55444164972",
-    appId: "1:55444164972:web:b515c28b1c1b65c044e349",
+  authDomain: "hrmanagament-b6c14.firebaseapp.com",
+  projectId: "hrmanagament-b6c14",
+  storageBucket: "hrmanagament-b6c14.appspot.com",
+  messagingSenderId: "55444164972",
+  appId: "1:55444164972:web:b515c28b1c1b65c044e349",
 };
+interface FirebaseContextType {
+  user: User | null;
+  userData: any;
+  employees: Employee[];
+  signup: (email: string, password: string) => Promise<void>;
+  signin: (email: string, password: string) => Promise<void>;
+  fetchEmployees: () => Promise<void>;
+  writeUserData: (userData: Employee) => Promise<void>;
+  addProject: (
+    projectName: string,
+    selectedEmployees: string[],
+    setProjectName: React.Dispatch<React.SetStateAction<string>>,
+    setSelectedEmployees: React.Dispatch<React.SetStateAction<string[]>>
+  ) => Promise<void>;
+}
+interface Employee {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  gender: string;
+  department: string;
+  role: string;
+}
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
+const firebaseAuth = getAuth(app);
+const FirebaseContext = createContext<FirebaseContextType | undefined>(
+  undefined
+);
 
-interface AuthContextType {
-  user: User | null;
-  userData: any;
-  signup: (email: string, password: string) => Promise<void>;
-  signin: (email: string, password: string) => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
+export const useFirebase = () => {
+  const context = useContext(FirebaseContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useFirebase must be used within a FirebaseProvider");
   }
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const navigate = useNavigate();
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<any>(null);
-
+  const [employees, setEmployees] = useState<Employee[]>([]);
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
       setUser(user);
       if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userDoc = await getDoc(doc(db, "users", user.uid));
         setUserData(userDoc.data());
       } else {
         setUserData(null);
@@ -118,24 +92,115 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
     return unsubscribe;
   }, []);
+  
+  const fetchEmployees = async () => {
+    try {
+      const querySnapshot = await getDocs(
+        collection(
+          db,
+          "users",
+          localStorage.getItem("userId") || "",
+          "employees"
+        )
+      );
+
+      const employeesData = querySnapshot.docs.map((doc, ID) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as any;
+      console.log("employees data is: ", employeesData);
+      setEmployees(employeesData);
+    } catch (error) {
+      console.error("Error fetching employees: ", error);
+    }
+  };
+
+  const writeUserData = async (userData: Employee) => {
+    try {
+      const docRef = await addDoc(
+        collection(
+          db,
+          "users",
+          localStorage.getItem("userId") || "",
+          "employees"
+        ),
+        {
+          name: userData.name,
+          email: userData.email,
+          phoneNumber: userData.phoneNumber,
+          gender: userData.gender,
+          department: userData.department,
+          role: userData.role,
+        }
+      );
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+  const handleEmployees = () => {
+    fetchEmployees();
+  };
 
   const signup = async (email: string, password: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    await setDoc(doc(db, 'users', user.uid), {
-      uid: user.uid,
-      email: user.email,
-    });
+    createUserWithEmailAndPassword(firebaseAuth, email, password)
+      .then(() => {
+        console.log("Signup successful");
+        navigate("/employees");
+      })
+      .catch((err) => {
+        alert("Wrong email or password entered");
+      });
   };
 
   const signin = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    signInWithEmailAndPassword(firebaseAuth, email, password)
+      .then((data: any) => {
+        console.log("user data is: ", data.user);
+        setUser(data.user);
+        localStorage.setItem("token", data.user.accessToken);
+        localStorage.setItem("email", data.user.email);
+        localStorage.setItem("userId", data.user.uid);
+        setIsAuthenticated(true);
+        navigate("/employees");
+      })
+      .catch((err) => console.log("Error in SignIn ", err));
+  };
+
+  const addProject = async (
+    projectName: string,
+    selectedEmployees: string[],
+    setProjectName: React.Dispatch<React.SetStateAction<string>>,
+    setSelectedEmployees: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    try {
+      await addDoc(collection(db, "projects"), {
+        name: projectName,
+        employees: selectedEmployees,
+      });
+      setProjectName("");
+      setSelectedEmployees([]);
+      alert("Project created successfully!");
+    } catch (error) {
+      console.error("Error creating project: ", error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, userData, signup, signin }}>
+    <FirebaseContext.Provider
+      value={{
+        user,
+        userData,
+        signup,
+        signin,
+        fetchEmployees,
+        addProject,
+        employees,
+        writeUserData,
+      }}
+    >
       {children}
-    </AuthContext.Provider>
+    </FirebaseContext.Provider>
   );
 };
-export {db,auth};
+export { db, firebaseAuth };

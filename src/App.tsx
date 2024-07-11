@@ -1,42 +1,94 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from './context/Firebase';
-import EmployeeForm from './pages/EmployeeForm';
-import EmployeeList from './pages/EmployeeList';
-import Signup from './pages/Signup';
-import Signin from './pages/Signin';
-import EmployeeDetail from './pages/EmployeeDetail';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import SignIn from "./pages/SignIn/SignIn";
+import SignUp from "./pages/SignUp/SignUp";
+import PublicRoute from "./Routes/PublicRoute";
+import PrivateRoute from "./Routes/PrivateRoute";
+import Project from "./pages/Project/Project";
+import EmployeeList from "./pages/Employee/EmployeeList";
+import EmployeeDetail from "./pages/Employee/EmployeeDetail";
+import Navbar from "./Components/Navbar";
+import SideBar from "./Components/SideBar";
+import "./App.css";
+import { useAuth } from "./context/authContext";
+import Attendance from "./pages/Attendance";
+import Payroll from "./pages/Payroll";
+import Dashboard from "./pages/Dashboard";
 
 const App: React.FC = () => {
-  const [user, loading, error] = useAuthState(auth);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
+  const { isAuthenticated } = useAuth();
   return (
-    <Router>
-      <div>
-        <h1>Employee Management System</h1>
+    <div>
+      <Navbar />
+      <SideBar />
+      <div className="mainContent">
         <Routes>
-          <Route path="/" element={user ? <Navigate to="/employees" /> : <Signup />} />
-          <Route path="/signin" element={user ? <Navigate to="/employees" /> : <Signin />} />
+          <Route path="/" element={<Dashboard/>} />
+          <Route
+            path="/signIn"
+            element={
+              <PublicRoute>
+                <SignIn />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/signUp"
+            element={
+              <PublicRoute>
+                <SignUp />
+              </PublicRoute>
+            }
+          />
           <Route
             path="/employees"
-            element={user ? (
-              <>
-                <EmployeeForm />
+            element={
+              <PrivateRoute>
                 <EmployeeList />
-              </>
-            ) : (
-              <Navigate to="/signin" replace />
-            )}
+              </PrivateRoute>
+            }
           />
-          <Route path="/employees/:id" element={<EmployeeDetail />} />
+          <Route
+            path="/employee/:id"
+            element={
+              <PrivateRoute>
+                <EmployeeDetail />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects"
+            element={
+              <PrivateRoute>
+                <Project />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/attendance"
+            element={
+              <PrivateRoute>
+                <Attendance/>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/payroll"
+            element={
+              <PrivateRoute>
+                <Payroll/>
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<h3>Page Not Found</h3>} />
         </Routes>
       </div>
-    </Router>
+    </div>
   );
 };
 

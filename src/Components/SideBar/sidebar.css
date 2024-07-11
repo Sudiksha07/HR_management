@@ -1,0 +1,45 @@
+.sidebar{
+    position: absolute;
+    height:100%;
+    left:0;
+    background-color: rgb(39 39 42);
+    width: 250px;
+    top:64px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items:center;
+}
+.menuItems{
+    padding:12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 226px;
+}
+.menuItem{
+    color:white;
+}
+.menuItems:hover{
+    background-color: rgb(31 41 55);
+    border-radius:0px 20px 20px 0px;
+    border: solid white 3px;
+}
+.menuItems:hover .menuItem,
+.menuItems:hover .menuIcon {
+  color: white
+}
+.menuIcon{
+    color:white;
+    margin:0px 5px;
+}
+.menuItems.selected {
+    background-color:rgb(31 41 55);
+    border-radius:0px 20px 20px 0px;
+    border: solid white 3px;
+}
+.menuItems.selected .menuItem,
+.menuItems.selected .menuIcon {
+  color: white
+}

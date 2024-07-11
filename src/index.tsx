@@ -1,27 +1,25 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import {  AuthProvider } from './context/Firebase';
-//import {FirebaseProvider} from "../src/context/Firebase"
-// import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-
-// import Employee from './pages/Employee';
-
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import { FirebaseProvider } from "./context/Firebase";
+import { AuthProvider } from "./context/authContext";
+import { BrowserRouter } from "react-router-dom";
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    {/* <FirebaseProvider> */}
+  <React.Fragment>
     <AuthProvider>
-    <App/>
-    {/* </FirebaseProvider> */}
+      <BrowserRouter>
+        <FirebaseProvider>
+          <App />
+        </FirebaseProvider>
+      </BrowserRouter>
     </AuthProvider>
-  </React.StrictMode>
+  </React.Fragment>
 );
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-

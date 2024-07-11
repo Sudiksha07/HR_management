@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { db, auth } from '../context/Firebase';
+import { db, firebaseAuth } from '../../context/Firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import TextField from '@mui/material/TextField';
@@ -34,7 +34,7 @@ const EmployeeForm: React.FC = () => {
     department: '',
     role: '',
   });
-  const [user] = useAuthState(auth);
+  const [user] = useAuthState(firebaseAuth);
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
