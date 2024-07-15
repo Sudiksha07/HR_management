@@ -1,3 +1,4 @@
+// EmployeeForm.tsx
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { db, firebaseAuth } from '../../context/Firebase';
 import { collection, addDoc } from 'firebase/firestore';
@@ -20,10 +21,11 @@ interface FormData {
   gender: string;
   department: string;
   role: string;
+  Salary:string;
 }
 
-const departments = ['HR', 'Engineering', 'Marketing', 'Sales']; // Example departments
-const roles = ['Manager', 'Developer', 'Designer', 'Marketer']; // Example roles
+const departments = ['HR', 'Engineering', 'Buisness', 'Sales'];
+const roles = ['Manager', 'Developer', 'Designer', 'Marketer'];
 
 const EmployeeForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -33,6 +35,7 @@ const EmployeeForm: React.FC = () => {
     gender: '',
     department: '',
     role: '',
+    Salary:'',
   });
   const [user] = useAuthState(firebaseAuth);
   const [open, setOpen] = useState(false);
@@ -47,15 +50,15 @@ const EmployeeForm: React.FC = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
+    setFormData(prev => ({
+      ...prev,
       [name]: value,
     }));
   };
 
   const handleSelectChange = (name: keyof FormData) => (e: SelectChangeEvent<string>) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
+    setFormData(prev => ({
+      ...prev,
       [name]: e.target.value,
     }));
   };
@@ -65,7 +68,7 @@ const EmployeeForm: React.FC = () => {
     if (!user) return;
 
     try {
-      await addDoc(collection(db, 'users', user?.uid, 'employees'), formData);
+      await addDoc(collection(db, `users/${user.uid}/employees`), formData);
       console.log('Employee added successfully');
       setFormData({
         name: '',
@@ -74,6 +77,7 @@ const EmployeeForm: React.FC = () => {
         gender: '',
         department: '',
         role: '',
+        Salary:'' ,
       });
       handleClose();
     } catch (error) {
@@ -112,6 +116,7 @@ const EmployeeForm: React.FC = () => {
               onChange={handleChange}
               required
             />
+
             <FormControl fullWidth margin="dense">
               <InputLabel>Department</InputLabel>
               <Select
@@ -120,7 +125,7 @@ const EmployeeForm: React.FC = () => {
                 onChange={handleSelectChange('department')}
                 required
               >
-                {departments.map((dept) => (
+                {departments.map(dept => (
                   <MenuItem key={dept} value={dept}>
                     {dept}
                   </MenuItem>
@@ -138,6 +143,17 @@ const EmployeeForm: React.FC = () => {
               onChange={handleChange}
               required
             />
+            <TextField
+              margin="dense"
+              label="Salary"
+              type="Salary"
+              fullWidth
+              variant="standard"
+              name="Salary"
+              value={formData.Salary}
+              onChange={handleChange}
+              required
+            />
             <FormControl fullWidth margin="dense">
               <InputLabel>Role</InputLabel>
               <Select
@@ -146,7 +162,7 @@ const EmployeeForm: React.FC = () => {
                 onChange={handleSelectChange('role')}
                 required
               >
-                {roles.map((role) => (
+                {roles.map(role => (
                   <MenuItem key={role} value={role}>
                     {role}
                   </MenuItem>

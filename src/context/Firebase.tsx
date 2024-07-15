@@ -20,6 +20,8 @@ import {
   getDoc,
   collection,
   getDocs,
+  updateDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./authContext";
@@ -46,7 +48,13 @@ interface FirebaseContextType {
     setProjectName: React.Dispatch<React.SetStateAction<string>>,
     setSelectedEmployees: React.Dispatch<React.SetStateAction<string[]>>
   ) => Promise<void>;
+  markAttendance: (
+    employeeId: string,
+    status: string
+  ) => Promise<void>;
+  fetchAttendance: (employeeId: string) => Promise<void>;
 }
+
 interface Employee {
   id: string;
   name: string;
@@ -92,7 +100,49 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
     });
     return unsubscribe;
   }, []);
-  
+  const markAttendance = async (
+    employeeId: string,
+    status: string
+  ) => {
+    try {
+      const attendanceDoc = await addDoc(
+        collection(
+          db,
+          "users",
+          localStorage.getItem("userId") || "",
+          "attendance"
+        ),
+        {
+          employeeId,
+          status,
+          date: Timestamp.now(),
+          signOutTime: null,
+        }
+      );
+      console.log("Attendance marked with ID: ", attendanceDoc.id);
+    } catch (e) {
+      console.error("Error marking attendance: ", e);
+    }
+  };
+  const fetchAttendance = async (employeeId: string) => {
+    try {
+      const querySnapshot = await getDocs(
+        collection(
+          db,
+          "users",
+          localStorage.getItem("userId") || "",
+          "attendance"
+        )
+      );
+      const attendanceData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as any;
+      return attendanceData;
+    } catch (error) {
+      console.error("Error fetching attendance: ", error);
+    }
+  };
   const fetchEmployees = async () => {
     try {
       const querySnapshot = await getDocs(
@@ -197,6 +247,8 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
         addProject,
         employees,
         writeUserData,
+        markAttendance,
+        fetchAttendance,
       }}
     >
       {children}
