@@ -25,7 +25,7 @@ const SignUp = () => {
     }
 };
   return (
-    <Container component="main" maxWidth="xs" sx={{marginTop:"20px"}}>
+    <Container component="main" maxWidth="xs" sx={{marginTop:"-30px"}}>
             <Box
                 sx={{
                     marginTop: 8,

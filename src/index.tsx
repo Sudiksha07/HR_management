@@ -5,6 +5,17 @@ import App from "./App";
 import { FirebaseProvider } from "./context/Firebase";
 import { AuthProvider } from "./context/authContext";
 import { BrowserRouter } from "react-router-dom";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { blue, green, red } from "@mui/material/colors"; // Adjust colors as per your theme
+
+const theme = createTheme({
+  palette: {
+    primary: blue,
+    secondary: green,
+    error: red,
+    // Add more customizations as needed
+  },
+});
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
@@ -13,7 +24,9 @@ root.render(
     <AuthProvider>
       <BrowserRouter>
         <FirebaseProvider>
-          <App />
+          <ThemeProvider theme={theme}>
+            <App />
+          </ThemeProvider>
         </FirebaseProvider>
       </BrowserRouter>
     </AuthProvider>

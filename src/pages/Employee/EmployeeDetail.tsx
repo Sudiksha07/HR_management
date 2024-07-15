@@ -2,17 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useParams } from "react-router-dom";
 import { db, firebaseAuth } from "../../context/Firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { getDoc, doc } from "firebase/firestore";
+import { createTheme } from "@mui/material/styles";
+import styled from "styled-components";
 import {
-  Card,
-  CardContent,
-  Typography,
-  CircularProgress,
-  Container,
-  Grid,
-  Box
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 
 interface Employee {
   name: string;
@@ -21,44 +22,44 @@ interface Employee {
   gender: string;
   department: string;
   role: string;
+  Salary: string;
 }
 
-const useStyles = makeStyles({
-  card: {
-    backgroundColor: "rgb(53, 35, 73)",
-    color: "#ffffff",
-    borderRadius: "12px",
-  },
-  container: {
-    marginTop: "20px",
-  },
-  title: {
-    marginBottom: "16px",
-    fontSize: "24px",
-    fontWeight: "bold",
-  },
-  text: {
-    marginBottom: "8px",
-    fontSize: "16px",
-  },
-  loaderBox: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
+const Container = styled.div`
+  padding: 24px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 50px;
+`;
+
+const Title = styled.h1`
+  text-align: center;
+  color: #008080;
+  margin-bottom: 16px;
+`;
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#008080",
+    },
   },
 });
 
 const EmployeeDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // Get employee ID from URL params
+  const { id } = useParams<{ id: string }>();
   const [employee, setEmployee] = useState<Employee | null>(null);
-  const [user] = useAuthState(firebaseAuth); // Ensure 'auth' is correctly initialized
-  const classes = useStyles();
+  const [user] = useAuthState(firebaseAuth);
 
   useEffect(() => {
     const fetchEmployee = async () => {
-      if (!user) return; // Check if user is authenticated
       try {
+        if (!user) return;
+
         const employeeRef = doc(db, `users/${user.uid}/employees/${id}`);
         const employeeSnap = await getDoc(employeeRef);
 
@@ -66,6 +67,7 @@ const EmployeeDetail: React.FC = () => {
           setEmployee(employeeSnap.data() as Employee);
         } else {
           console.log("No such document!");
+          setEmployee(null);
         }
       } catch (error) {
         console.error("Error fetching employee:", error);
@@ -73,49 +75,63 @@ const EmployeeDetail: React.FC = () => {
     };
 
     fetchEmployee();
-  }, [user, id]);
+  }, [id, user]);
 
   if (!employee) {
-    return (
-      <Container>
-        <Box className={classes.loaderBox}>
-          <CircularProgress />
-        </Box>
-      </Container>
-    );
+    return <div>Loading employee details...</div>;
   }
 
   return (
-    <Container className={classes.container}>
-      <Grid container justifyContent="center">
-        <Grid item xs={12} md={6}>
-          <Card className={classes.card} sx={{backgroundImage:'url(/images/bgg.jpg)'}}>
-            <CardContent>
-              <Typography className={classes.title} variant="h5" component="div" sx={{color:"black"}}>
-                Employee Details
-              </Typography>
-              <Typography className={classes.text} variant="body2" color="inherit" sx={{color:"black"}}>
-                Name: {employee.name}
-              </Typography>
-              <Typography className={classes.text} variant="body2" color="inherit" sx={{color:"black"}}>
-                Email: {employee.email}
-              </Typography>
-              <Typography className={classes.text} variant="body2" color="inherit" sx={{color:"black"}}>
-                Phone Number: {employee.phoneNumber}
-              </Typography>
-              <Typography className={classes.text} variant="body2" color="inherit" sx={{color:"black"}}>
-                Gender: {employee.gender}
-              </Typography>
-              <Typography className={classes.text} variant="body2" color="inherit" sx={{color:"black"}}>
-                Department: {employee.department}
-              </Typography>
-              <Typography className={classes.text} variant="body2" color="inherit" sx={{color:"black"}}>
-                Role: {employee.role}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+    <Container>
+      <Title>Employee Detail</Title>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <strong>Name</strong>
+              </TableCell>
+              <TableCell>{employee.name}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Email</strong>
+              </TableCell>
+              <TableCell>{employee.email}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Phone Number</strong>
+              </TableCell>
+              <TableCell>{employee.phoneNumber}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Gender</strong>
+              </TableCell>
+              <TableCell>{employee.gender}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Department</strong>
+              </TableCell>
+              <TableCell>{employee.department}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Role</strong>
+              </TableCell>
+              <TableCell>{employee.role}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Salary</strong>
+              </TableCell>
+              <TableCell>{employee.Salary}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Container>
   );
 };

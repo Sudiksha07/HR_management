@@ -23,7 +23,8 @@ import {
   collection,
   getDocs,
   deleteDoc,
-  updateDoc
+  updateDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./authContext";
@@ -55,7 +56,9 @@ interface FirebaseContextType {
     leadEmployee: string
   ) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
-  updateProject:(id:string,formData:any)=>Promise<void>;
+  updateProject: (id: string, formData: any) => Promise<void>;
+  markAttendance: (employeeId: string, status: string) => Promise<void>;
+  fetchAttendance: (employeeId: string) => Promise<void>;
 }
 interface Employee {
   id: string;
@@ -256,13 +259,54 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const updateProject = async (editProjectId:string,formData:any) => {
-    const userId=localStorage.getItem('userId')
+  const updateProject = async (editProjectId: string, formData: any) => {
+    const userId = localStorage.getItem("userId");
     try {
-      const employeeRef = doc(db,`users/${userId}/projects/${editProjectId}`);
-      await updateDoc(employeeRef, formData); 
+      const employeeRef = doc(db, `users/${userId}/projects/${editProjectId}`);
+      await updateDoc(employeeRef, formData);
     } catch (error) {
       console.error("Error updating employee: ", error);
+    }
+  };
+
+  const markAttendance = async (employeeId: string, status: string) => {
+    try {
+      const attendanceDoc = await addDoc(
+        collection(
+          db,
+          "users",
+          localStorage.getItem("userId") || "",
+          "attendance"
+        ),
+        {
+          employeeId,
+          status,
+          date: Timestamp.now(),
+          signOutTime: null,
+        }
+      );
+      console.log("Attendance marked with ID: ", attendanceDoc.id);
+    } catch (e) {
+      console.error("Error marking attendance: ", e);
+    }
+  };
+  const fetchAttendance = async (employeeId: string) => {
+    try {
+      const querySnapshot = await getDocs(
+        collection(
+          db,
+          "users",
+          localStorage.getItem("userId") || "",
+          "attendance"
+        )
+      );
+      const attendanceData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as any;
+      return attendanceData;
+    } catch (error) {
+      console.error("Error fetching attendance: ", error);
     }
   };
   return (
@@ -282,7 +326,9 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
         fetchProjects,
         signUpWithGoogle,
         deleteProject,
-        updateProject
+        updateProject,
+        markAttendance,
+        fetchAttendance,
       }}
     >
       {children}

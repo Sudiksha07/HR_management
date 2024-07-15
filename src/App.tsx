@@ -19,17 +19,19 @@ import { useAuth } from "./context/authContext";
 import Attendance from "./pages/Attendance";
 import Payroll from "./pages/Payroll";
 import Dashboard from "./pages/Dashboard";
-
+import LeavePage from "./pages/Attendance/LeavePage";
 const App: React.FC = () => {
   const { isAuthenticated } = useAuth();
   return (
     <div>
-      
-      <Navbar/>
+      <Navbar />
       <SideBar />
-      <div className={isAuthenticated?"dashboard":"mainContent"}>
+      <div className={isAuthenticated ? "dashboard" : "mainContent"}>
         <Routes>
-          <Route path="/" element={isAuthenticated?<EmployeeList/>:<Dashboard/>} />
+          <Route
+            path="/"
+            element={isAuthenticated ? <EmployeeList /> : <Dashboard />}
+          />
           <Route
             path="/signIn"
             element={
@@ -74,7 +76,7 @@ const App: React.FC = () => {
             path="/attendance"
             element={
               <PrivateRoute>
-                <Attendance/>
+                <Attendance />
               </PrivateRoute>
             }
           />
@@ -82,7 +84,15 @@ const App: React.FC = () => {
             path="/payroll"
             element={
               <PrivateRoute>
-                <Payroll/>
+                <Payroll />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/leave"
+            element={
+              <PrivateRoute>
+                <LeavePage />
               </PrivateRoute>
             }
           />
