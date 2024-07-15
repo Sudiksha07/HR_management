@@ -6,11 +6,10 @@ import {
   deleteDoc,
   doc,
   updateDoc,
-  DocumentData,
 } from "firebase/firestore";
-// import { routes } from 'react-router-dom'
 import { Link } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
+import styled from "styled-components";
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
 import TableHead from "@mui/material/TableHead";
@@ -27,9 +26,10 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-
+import EmployeeForm from "./EmployeeForm";
+import { createTheme } from "@mui/material/styles";
 interface Employee {
-  id: string;
+  id: string; // Firestore document ID
   name: string;
   email: string;
   phoneNumber: string;
@@ -37,24 +37,104 @@ interface Employee {
   department: string;
   role: string;
 }
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#008080",
+    },
+  },
+});
+const Title = styled.h1`
+  text-align: center;
+  color: ${theme.palette.primary.main};
+  margin-bottom: 16px;
+`;
 
 const departments = ["HR", "Engineering", "Marketing", "Sales"];
 const roles = ["Manager", "Developer", "Designer", "Marketer"];
 
+// Styled Components
+const CustomTableContainer = styled(TableContainer)`
+  margin-bottom: 32px;
+`;
+const AddMemberButton = styled(Button)`
+  && {
+    position: absolute;
+    top: 80px;
+    right: 100px;
+    // background-color:black;
+  }
+`;
+const CustomTableHeader = styled(TableHead)`
+  background-color: #008080;
+`;
+
+const CustomTableCell = styled(TableCell)`
+  color: black; /* Change to black or another contrasting color */
+`;
+
+const CustomTableRow = styled(TableRow)`
+  && {
+    &:nth-of-type(odd) {
+      background-color: #f2f2f2;
+    }
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+`;
+
+const Container = styled.div`
+margin-top:80px;
+width:100%;
+  // padding: 100px /* Adjust padding as needed */
+  // width: calc(100% - 25px); /* Adjust this value based on the width of your sidebar */
+    margin-left: 15px; /* Adjust this value based on the width of your sidebar */ */} */}
+  background-color: #f0f4f8;
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh; /* Ensure the container takes the full height of the screen */
+`;
+
 const EmployeeList: React.FC = () => {
   const firebase = useFirebase();
-  const employees = firebase.employees;
-
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [user, setUser] = useAuthState(firebaseAuth);
   const [openDialog, setOpenDialog] = useState(false);
   const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
   const [formData, setFormData] = useState<Partial<Employee>>({});
 
   useEffect(() => {
-    firebase.fetchEmployees();
+    if (user) {
+      const unsubscribe = onSnapshot(
+        collection(db, "users", user.uid, "employees"),
+        (snapshot) => {
+          const updatedEmployees: Employee[] = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data(); // Ensure doc.data() contains all Employee properties
+            if (data) {
+              updatedEmployees.push({
+                id: doc.id,
+                name: data.name,
+                email: data.email,
+                phoneNumber: data.phoneNumber,
+                gender: data.gender,
+                department: data.department,
+                role: data.role,
+                
+              });
+            }
+          });
+          setEmployees(updatedEmployees);
+        }
+      );
+  
+      return () => unsubscribe();
+    }
   }, [user]);
+  
 
-  const handleDeleteEmployee = async (employeeId: any) => {
+  const handleDeleteEmployee = async (employeeId: string) => {
     if (!user) return;
 
     try {
@@ -65,7 +145,7 @@ const EmployeeList: React.FC = () => {
     }
   };
 
-  const handleOpenDialog = (employee: any) => {
+  const handleOpenDialog = (employee: Employee) => {
     setEditEmployee(employee);
     setFormData(employee);
     setOpenDialog(true);
@@ -81,13 +161,7 @@ const EmployeeList: React.FC = () => {
     if (!user || !editEmployee) return;
 
     try {
-      const employeeRef = doc(
-        db,
-        "users",
-        user.uid,
-        "employees",
-        editEmployee.id
-      );
+      const employeeRef = doc(db, "users", user.uid, "employees", editEmployee.id);
       await updateDoc(employeeRef, formData); // No need to cast now
       console.log("Employee updated successfully");
       handleCloseDialog();
@@ -116,29 +190,33 @@ const EmployeeList: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Employee List</h2>
-      <TableContainer>
+    // <div>
+<Container>
+      <AddMemberButton>
+      <EmployeeForm />
+      </AddMemberButton>
+      <Title>Employee Detail</Title>
+      <CustomTableContainer>
         <Table>
-          <TableHead>
+          <CustomTableHeader>
             <TableRow>
-              <TableCell>Employee ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Department</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Actions</TableCell>
+              <CustomTableCell>Employee ID</CustomTableCell>
+              <CustomTableCell>Name</CustomTableCell>
+              <CustomTableCell>Department</CustomTableCell>
+              <CustomTableCell>Role</CustomTableCell>
+              <CustomTableCell>Actions</CustomTableCell>
             </TableRow>
-          </TableHead>
+          </CustomTableHeader>
           <TableBody>
-            {employees.map((employee, id) => (
-              <TableRow key={id}>
-                <TableCell>{id}</TableCell>
-                <TableCell>{employee.name}</TableCell>
-                <TableCell>{employee.department}</TableCell>
-                <TableCell>{employee.role}</TableCell>
-                <TableCell>
+            {employees.map((employee) => (
+              <CustomTableRow key={employee.id}>
+                <CustomTableCell>{employee.id}</CustomTableCell>
+                <CustomTableCell>{employee.name}</CustomTableCell>
+                <CustomTableCell>{employee.department}</CustomTableCell>
+                <CustomTableCell>{employee.role}</CustomTableCell>
+                <CustomTableCell>
                   <IconButton
-                    onClick={() => handleDeleteEmployee(id)}
+                    onClick={() => handleDeleteEmployee(employee.id)}
                     aria-label="delete"
                   >
                     <DeleteIcon />
@@ -151,12 +229,12 @@ const EmployeeList: React.FC = () => {
                   </IconButton>
                   <Link to={`/employee/${employee.id}`}>View Details</Link>{" "}
                   {/* Link to EmployeeDetails */}
-                </TableCell>
-              </TableRow>
+                </CustomTableCell>
+              </CustomTableRow>
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </CustomTableContainer>
 
       {/* Edit Employee Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
@@ -246,7 +324,8 @@ const EmployeeList: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+      </Container>
+      // </div>
   );
 };
 

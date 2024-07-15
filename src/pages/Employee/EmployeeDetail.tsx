@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useParams } from "react-router-dom";
 import { db, firebaseAuth } from "../../context/Firebase";
-import { collection, doc, getDocs,getDoc } from "firebase/firestore";
+import { getDoc, doc } from "firebase/firestore";
+import { createTheme } from "@mui/material/styles";
+import styled from "styled-components";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+
 interface Employee {
   name: string;
   email: string;
@@ -10,25 +14,52 @@ interface Employee {
   gender: string;
   department: string;
   role: string;
+  Salary:string;
 }
+
+const Container = styled.div`
+  padding: 24px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 50px;
+`;
+
+const Title = styled.h1`
+  text-align: center;
+  color: #008080;
+  margin-bottom: 16px;
+`;
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#008080",
+    },
+  },
+});
+
 const EmployeeDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // Get employee ID from URL params
-  const [employee, setEmployee] = useState<Employee>();
-  const [user] = useAuthState(firebaseAuth); // Ensure 'auth' is correctly initialized
-  
+  const { id } = useParams<{ id: string }>();
+  const [employee, setEmployee] = useState<Employee | null>(null);
+  const [user] = useAuthState(firebaseAuth);
+
   useEffect(() => {
     const fetchEmployee = async () => {
-      // try {
-      if (!user) return; // Check if user is authenticated
       try {
-        const employeeReff = doc(db, `users/${user.uid}/employees/${id}`);
-        const employeeSnap = await getDoc(employeeReff);
+        if (!user) return;
 
-        if (employeeSnap.exists() != null) {
-          setEmployee(employeeSnap.data() as Employee)
+        const employeeRef = doc(db, `users/${user.uid}/employees/${id}`);
+        const employeeSnap = await getDoc(employeeRef);
+
+        if (employeeSnap.exists()) {
+          setEmployee(employeeSnap.data() as Employee);
         } else {
           console.log("No such document!");
-          return null;
+          setEmployee(null);
         }
       } catch (error) {
         console.error("Error fetching employee:", error);
@@ -36,22 +67,50 @@ const EmployeeDetail: React.FC = () => {
     };
 
     fetchEmployee();
-  }, []);
+  }, [id, user]);
 
   if (!employee) {
     return <div>Loading employee details...</div>;
   }
 
   return (
-    <div>
-      <h2>Employee Details</h2>
-      <p>Name: {employee.name}</p>
-      <p>Email: {employee.email}</p>
-      <p>Phone Number: {employee.phoneNumber}</p>
-      <p>Gender: {employee.gender}</p>
-      <p>Department: {employee.department}</p>
-      <p>Role: {employee.role}</p>
-    </div>
+    <Container>
+      <Title>Employee Detail</Title>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell><strong>Name</strong></TableCell>
+              <TableCell>{employee.name}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Email</strong></TableCell>
+              <TableCell>{employee.email}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Phone Number</strong></TableCell>
+              <TableCell>{employee.phoneNumber}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Gender</strong></TableCell>
+              <TableCell>{employee.gender}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Department</strong></TableCell>
+              <TableCell>{employee.department}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Role</strong></TableCell>
+              <TableCell>{employee.role}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell><strong>Salary</strong></TableCell>
+              <TableCell>{employee.Salary}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   );
 };
 

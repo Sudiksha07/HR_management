@@ -19,6 +19,8 @@ import { useAuth } from "./context/authContext";
 import Attendance from "./pages/Attendance";
 import Payroll from "./pages/Payroll";
 import Dashboard from "./pages/Dashboard";
+import LeavePage from "./pages/Attendance/LeavePage";
+import SalaryDetail from "./pages/Payroll/SalaryDetail";
 
 const App: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -61,6 +63,7 @@ const App: React.FC = () => {
               </PrivateRoute>
             }
           />
+
           <Route
             path="/projects"
             element={
@@ -85,6 +88,18 @@ const App: React.FC = () => {
               </PrivateRoute>
             }
           />
+      <Route
+  path="/salary/:id"
+  element={
+    <PrivateRoute>
+      <SalaryDetail />
+    </PrivateRoute>
+  }
+/>
+          <Route path="/leave" element={<PrivateRoute>
+            <LeavePage/>
+          </PrivateRoute>} />
+      
           <Route path="*" element={<h3>Page Not Found</h3>} />
         </Routes>
       </div>
