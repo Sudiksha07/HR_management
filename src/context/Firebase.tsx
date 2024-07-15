@@ -12,6 +12,8 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -20,6 +22,8 @@ import {
   getDoc,
   collection,
   getDocs,
+  deleteDoc,
+  updateDoc
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./authContext";
@@ -36,16 +40,22 @@ interface FirebaseContextType {
   user: User | null;
   userData: any;
   employees: Employee[];
+  projects: Project[];
   signup: (email: string, password: string) => Promise<void>;
   signin: (email: string, password: string) => Promise<void>;
+  signUpWithGoogle: () => Promise<void>;
   fetchEmployees: () => Promise<void>;
+  fetchProjects: () => Promise<void>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   writeUserData: (userData: Employee) => Promise<void>;
+  deleteEmployeeData: (employeeId: string) => Promise<void>;
   addProject: (
     projectName: string,
-    selectedEmployees: string[],
-    setProjectName: React.Dispatch<React.SetStateAction<string>>,
-    setSelectedEmployees: React.Dispatch<React.SetStateAction<string[]>>
+    selectedEmployees: [],
+    leadEmployee: string
   ) => Promise<void>;
+  deleteProject: (id: string) => Promise<void>;
+  updateProject:(id:string,formData:any)=>Promise<void>;
 }
 interface Employee {
   id: string;
@@ -55,6 +65,12 @@ interface Employee {
   gender: string;
   department: string;
   role: string;
+}
+interface Project {
+  id: string;
+  name: string;
+  leadEmployee: string;
+  employees: string[];
 }
 
 const app = initializeApp(firebaseConfig);
@@ -76,23 +92,64 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const navigate = useNavigate();
+  const provider = new GoogleAuthProvider();
   const { isAuthenticated, setIsAuthenticated } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<any>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
-      setUser(user);
-      if (user) {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        setUserData(userDoc.data());
-      } else {
-        setUserData(null);
-      }
-    });
-    return unsubscribe;
+    fetchEmployees();
   }, []);
-  
+
+  const signup = async (email: string, password: string) => {
+    createUserWithEmailAndPassword(firebaseAuth, email, password)
+      .then(() => {
+        console.log("Signup successful");
+        setIsAuthenticated(true);
+        navigate("/employees");
+      })
+      .catch((err) => {
+        alert("Wrong email or password entered");
+      });
+  };
+
+  const signUpWithGoogle = async () => {
+    const auth = getAuth();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential?.accessToken;
+        const user = result.user;
+        localStorage.setItem("userId", user.uid);
+        localStorage.setItem("email", user.email ? user.email : "");
+        setIsAuthenticated(true);
+        navigate("/employees");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+      });
+  };
+  const signin = async (email: string, password: string) => {
+    signInWithEmailAndPassword(firebaseAuth, email, password)
+      .then((data: any) => {
+        console.log("user data is: ", data.user);
+        setUser(data.user);
+        localStorage.setItem("token", data.user.accessToken);
+        localStorage.setItem("email", data.user.email);
+        localStorage.setItem("userId", data.user.uid);
+        setIsAuthenticated(true);
+        navigate("/employees");
+      })
+      .catch((err) => {
+        alert("Wrong email or password entered");
+        console.log("Error in SignIn ", err);
+      });
+  };
   const fetchEmployees = async () => {
     try {
       const querySnapshot = await getDocs(
@@ -107,9 +164,31 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
       const employeesData = querySnapshot.docs.map((doc, ID) => ({
         id: doc.id,
         ...doc.data(),
-      })) as any;
-      console.log("employees data is: ", employeesData);
+      })) as Employee[];
+
       setEmployees(employeesData);
+    } catch (error) {
+      console.error("Error fetching employees: ", error);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const querySnapshot = await getDocs(
+        collection(
+          db,
+          "users",
+          localStorage.getItem("userId") || "",
+          "projects"
+        )
+      );
+
+      const projectValue = querySnapshot.docs.map((project, ID) => ({
+        id: project.id,
+        ...project.data(),
+      })) as any;
+
+      setProjects(projectValue);
     } catch (error) {
       console.error("Error fetching employees: ", error);
     }
@@ -138,54 +217,54 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
       console.error("Error adding document: ", e);
     }
   };
-  const handleEmployees = () => {
-    fetchEmployees();
-  };
 
-  const signup = async (email: string, password: string) => {
-    createUserWithEmailAndPassword(firebaseAuth, email, password)
-      .then(() => {
-        console.log("Signup successful");
-        navigate("/employees");
-      })
-      .catch((err) => {
-        alert("Wrong email or password entered");
-      });
-  };
-
-  const signin = async (email: string, password: string) => {
-    signInWithEmailAndPassword(firebaseAuth, email, password)
-      .then((data: any) => {
-        console.log("user data is: ", data.user);
-        setUser(data.user);
-        localStorage.setItem("token", data.user.accessToken);
-        localStorage.setItem("email", data.user.email);
-        localStorage.setItem("userId", data.user.uid);
-        setIsAuthenticated(true);
-        navigate("/employees");
-      })
-      .catch((err) => console.log("Error in SignIn ", err));
+  const deleteEmployeeData = async (employeeId: string) => {
+    try {
+      const userId = localStorage.getItem("userId");
+      console.log("employee id: ", employeeId);
+      await deleteDoc(doc(db, `users/${userId}/employees/${employeeId}`));
+      console.log("Employee deleted successfully");
+    } catch (error) {
+      console.error("Error deleting employee: ", error);
+    }
   };
 
   const addProject = async (
     projectName: string,
-    selectedEmployees: string[],
-    setProjectName: React.Dispatch<React.SetStateAction<string>>,
-    setSelectedEmployees: React.Dispatch<React.SetStateAction<string[]>>
+    selectedEmployees: [],
+    leadEmployee: string
   ) => {
     try {
-      await addDoc(collection(db, "projects"), {
+      const userId = localStorage.getItem("userId");
+      await addDoc(collection(db, `users/${userId}/projects`), {
         name: projectName,
         employees: selectedEmployees,
+        leadEmployee: leadEmployee,
       });
-      setProjectName("");
-      setSelectedEmployees([]);
       alert("Project created successfully!");
     } catch (error) {
       console.error("Error creating project: ", error);
     }
   };
+  const deleteProject = async (id: string) => {
+    try {
+      const userId = localStorage.getItem("userId");
+      await deleteDoc(doc(db, `users/${userId}/projects/${id}`));
+      console.log("Project deleted successfully");
+    } catch (error) {
+      console.error("Error deleting employee: ", error);
+    }
+  };
 
+  const updateProject = async (editProjectId:string,formData:any) => {
+    const userId=localStorage.getItem('userId')
+    try {
+      const employeeRef = doc(db,`users/${userId}/projects/${editProjectId}`);
+      await updateDoc(employeeRef, formData); 
+    } catch (error) {
+      console.error("Error updating employee: ", error);
+    }
+  };
   return (
     <FirebaseContext.Provider
       value={{
@@ -197,6 +276,13 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
         addProject,
         employees,
         writeUserData,
+        deleteEmployeeData,
+        setUser,
+        projects,
+        fetchProjects,
+        signUpWithGoogle,
+        deleteProject,
+        updateProject
       }}
     >
       {children}

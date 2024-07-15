@@ -1,0 +1,87 @@
+.dashboardHeading {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row-reverse;
+    margin: 0px 40px 10px 0px;
+    padding: 20px;
+  }
+  .headingText{
+    color : #070753d0;
+    font-size: 40px;
+    font-family:"open-sans",sans-serif;
+    font-weight: 700;
+  }
+  .headingContent{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  .hrImage {
+    background-image: url('/public/images/hrg.png');
+    width: 500px;
+    height: 450px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+  }
+  
+  .sectionDetails {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding:30px;
+    margin:20px;
+  }
+  
+  .whatWeOffer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .content {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 30px;
+    padding: 20px;
+  }
+  
+  .reverseContent {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 30px;
+    padding: 20px;
+    flex-direction: row-reverse;
+  }
+  
+  .employeeImage,
+  .projectImage,
+  .leaveImage,
+  .payrollImage {
+    width: 500px;
+    height: 300px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 30px;
+  }
+  
+  .employeeImage {
+    background-image: url('/public/images/emp.jpg');
+  }
+  
+  .projectImage {
+    background-image: url('/public/images/projects.jpeg');
+  }
+  
+  .leaveImage {
+    background-image: url('/public/images/leave.jpg');
+  }
+  
+  .payrollImage {
+    background-image: url('/public/images/payroll.jpeg');
+  }
+  

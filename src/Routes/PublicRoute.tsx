@@ -10,7 +10,7 @@ const PublicRoute: FC<PublicRouteProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
-    return <Navigate to="/" />;
+    return <Navigate to="/employees" />;
   }
 
   return children;

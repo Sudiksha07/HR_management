@@ -8,7 +8,6 @@ import {
   updateDoc,
   DocumentData,
 } from "firebase/firestore";
-// import { routes } from 'react-router-dom'
 import { Link } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import TableContainer from "@mui/material/TableContainer";
@@ -27,6 +26,9 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
+import { Container, Typography } from "@mui/material";
+import EmployeeForm from "./EmployeeForm";
 
 interface Employee {
   id: string;
@@ -49,20 +51,15 @@ const EmployeeList: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
   const [formData, setFormData] = useState<Partial<Employee>>({});
-
+  const [addEmployeeButton, setAddEmployeeButton] = useState<Boolean>(false);
   useEffect(() => {
     firebase.fetchEmployees();
-  }, [user]);
+  }, []);
 
   const handleDeleteEmployee = async (employeeId: any) => {
-    if (!user) return;
-
-    try {
-      await deleteDoc(doc(db, "users", user.uid, "employees", employeeId));
-      console.log("Employee deleted successfully");
-    } catch (error) {
-      console.error("Error deleting employee: ", error);
-    }
+    firebase.deleteEmployeeData(employeeId);
+    firebase.fetchEmployees()
+    
   };
 
   const handleOpenDialog = (employee: any) => {
@@ -90,6 +87,7 @@ const EmployeeList: React.FC = () => {
       );
       await updateDoc(employeeRef, formData); // No need to cast now
       console.log("Employee updated successfully");
+      firebase.fetchEmployees();
       handleCloseDialog();
     } catch (error) {
       console.error("Error updating employee: ", error);
@@ -117,13 +115,20 @@ const EmployeeList: React.FC = () => {
 
   return (
     <div>
-      <h2>Employee List</h2>
-      <TableContainer>
+      <EmployeeForm />
+      <Typography variant="h5" sx={{ margin: "20px 0px" }}>
+        Employee List
+      </Typography>
+      <TableContainer
+        sx={{
+          maxHeight: "300px",
+          overflow: "auto",
+        }}
+      >
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Employee ID</TableCell>
-              <TableCell>Name</TableCell>
+              <TableCell>Employee name</TableCell>
               <TableCell>Department</TableCell>
               <TableCell>Role</TableCell>
               <TableCell>Actions</TableCell>
@@ -131,26 +136,55 @@ const EmployeeList: React.FC = () => {
           </TableHead>
           <TableBody>
             {employees.map((employee, id) => (
-              <TableRow key={id}>
-                <TableCell>{id}</TableCell>
+              <TableRow key={id} style={{ borderBottom: "1px solid black" }}>
                 <TableCell>{employee.name}</TableCell>
                 <TableCell>{employee.department}</TableCell>
                 <TableCell>{employee.role}</TableCell>
                 <TableCell>
-                  <IconButton
-                    onClick={() => handleDeleteEmployee(id)}
-                    aria-label="delete"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => handleOpenDialog(employee)}
-                    aria-label="edit"
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <Link to={`/employee/${employee.id}`}>View Details</Link>{" "}
-                  {/* Link to EmployeeDetails */}
+                  <Box display="flex" alignItems="center">
+                    <Box mr={1}>
+                      <IconButton
+                        onClick={() => handleDeleteEmployee(employee.id)}
+                        aria-label="delete"
+                        style={{
+                          backgroundColor: "#f44336",
+                          color: "white",
+                          borderRadius: "10px",
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                    <Box mr={1}>
+                      <IconButton
+                        onClick={() => handleOpenDialog(employee)}
+                        aria-label="edit"
+                        style={{
+                          backgroundColor: "#405cf5",
+                          color: "white",
+                          borderRadius: "10px",
+                        }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Box>
+                    <Box mr={1}>
+                      <Link
+                        to={`/employee/${employee.id}`}
+                        style={{ textDecoration: "none" }}
+                      >
+                        <Button
+                          style={{
+                            backgroundColor: "#04AA6D",
+                            color: "white",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      </Link>
+                    </Box>
+                  </Box>
                 </TableCell>
               </TableRow>
             ))}

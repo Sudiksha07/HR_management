@@ -9,7 +9,7 @@ import SignIn from "./pages/SignIn/SignIn";
 import SignUp from "./pages/SignUp/SignUp";
 import PublicRoute from "./Routes/PublicRoute";
 import PrivateRoute from "./Routes/PrivateRoute";
-import Project from "./pages/Project/Project";
+import Project from "./pages/Project/index";
 import EmployeeList from "./pages/Employee/EmployeeList";
 import EmployeeDetail from "./pages/Employee/EmployeeDetail";
 import Navbar from "./Components/Navbar";
@@ -24,11 +24,12 @@ const App: React.FC = () => {
   const { isAuthenticated } = useAuth();
   return (
     <div>
-      <Navbar />
+      
+      <Navbar/>
       <SideBar />
-      <div className="mainContent">
+      <div className={isAuthenticated?"dashboard":"mainContent"}>
         <Routes>
-          <Route path="/" element={<Dashboard/>} />
+          <Route path="/" element={isAuthenticated?<EmployeeList/>:<Dashboard/>} />
           <Route
             path="/signIn"
             element={

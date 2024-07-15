@@ -10,56 +10,80 @@ import { useAuth } from "../../context/authContext";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
+import path from "path";
+
 interface MenuItem {
   name: string;
   icon: React.ElementType;
 }
 const SideBar = () => {
-  const [selectedItem, setSelectedItem] = useState<number>(0);
+  const [selectedItem, setSelectedItem] = useState<number|null>(0);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const { isAuthenticated, setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
   const menuItems1 = [
-    { name: "Dashboard", icon: SpaceDashboardIcon },
     { name: "Employees", icon: PeopleIcon },
     { name: "Projects", icon: AutoAwesomeMotionIcon },
     { name: "Attendance", icon: CalendarTodayIcon },
     { name: "Payroll", icon: AccountBalanceIcon },
     { name: "Logout", icon: LogoutIcon },
   ];
-  const menuItems2 = [
-    { name: "Dashboard", icon: SpaceDashboardIcon },
-    { name: "SignIn", icon: LockOpenIcon },
-    { name: "SignUp", icon: HowToRegIcon },
-  ];
-
+ 
   useEffect(() => {
     if (isAuthenticated) {
+      setSelectedItem(0);
       setMenuItems(menuItems1);
-    } else {
-      setSelectedItem(0)
-      setMenuItems(menuItems2);
     }
   }, [isAuthenticated]);
+  
+  useEffect(()=>{
+    const pathname=window.location.pathname;
+    console.log("pathname",pathname)
+    if(pathname==='/' && isAuthenticated){
+      setSelectedItem(0)
+    }
+    if(pathname=='/employees' || pathname=='/signin'){
+      setSelectedItem(0);
+    }
+    else if(pathname=='/projects' || pathname=='/signup'){
+      console.log("pro")
+      setSelectedItem(1);
+    }
+    else if(pathname=='/attendance'){
+      setSelectedItem(2);
+    }
+    else if(pathname=='/payroll'){
+      setSelectedItem(3);
+    }
+    else{
+      setSelectedItem(0)
+    }
+  },[selectedItem])
+
+
   const handleSelection = (id: number) => {
     setSelectedItem(id);
 
     if (menuItems[id].name == "Logout") {
       localStorage.clear();
       setIsAuthenticated(false);
+      setSelectedItem(1);
+      localStorage.setItem('logout','true')
+      navigate("/signin");
+    } 
+    else if (menuItems[id].name == "Dashboard") {
       navigate("/");
-    } else if (menuItems[id].name == "Dashboard") {
-      navigate("/");
-    } else {
+    }
+     else {
       navigate(menuItems[id].name.toLowerCase());
     }
   };
   return (
-    <div className="sidebar">
+    <div className={isAuthenticated?"sidebar":"sidebar noSidebar"}>
       {menuItems.map((item: any, id: any) => {
         const Icon = item.icon;
         const isSelected = selectedItem === id;
-
+        
         return (
           <div
             key={id}

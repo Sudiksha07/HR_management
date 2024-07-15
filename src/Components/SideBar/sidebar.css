@@ -1,14 +1,17 @@
 .sidebar{
     position: absolute;
-    height:100%;
+    top:12%;
+    height:88%;
     left:0;
     background-color: rgb(39 39 42);
     width: 250px;
-    top:64px;
     display: flex;
     justify-content: flex-start;
     flex-direction: column;
     align-items:center;
+}
+.noSidebar{
+    display: none;
 }
 .menuItems{
     padding:12px;
@@ -42,4 +45,12 @@
 .menuItems.selected .menuItem,
 .menuItems.selected .menuIcon {
   color: white
+}
+@media (max-width: 1000px) and (min-width:800px) {
+    .sidebar {
+      width: 200px;
+    }
+    .menuItems{
+        width:176px;
+    }
 }

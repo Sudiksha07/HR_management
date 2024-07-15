@@ -18,12 +18,11 @@ const SignIn = () => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     firebase.signin(email,password)
-    console.log('Email:', email);
-    console.log('Password:', password);
+    
 };
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="xs" sx={{marginTop:"30px"}}>
       <Box
         sx={{
           marginTop: 8,

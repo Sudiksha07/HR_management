@@ -4,17 +4,15 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import Switch from "@mui/material/Switch";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormGroup from "@mui/material/FormGroup";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
+import { useNavigate } from "react-router-dom";
 export default function Navbar() {
   const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const navigate = useNavigate();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAuth(event.target.checked);
@@ -41,8 +39,8 @@ export default function Navbar() {
           >
             {/* <MenuIcon /> */}
             <HomeIcon
-              onClick={() => console.log("hello")}
               sx={{ color: "rgb(31 41 55)" }}
+              onClick={() => navigate("/")}
             />
           </IconButton>
           <Typography
@@ -85,11 +83,23 @@ export default function Navbar() {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose} sx={{ color: "rgb(31 41 55)" }}>
-                  Profile
+                <MenuItem
+                  onClick={() => {
+                    navigate("/signIn");
+                    setAnchorEl(null);
+                  }}
+                  sx={{ color: "rgb(31 41 55)" }}
+                >
+                  SignIn
                 </MenuItem>
-                <MenuItem onClick={handleClose} sx={{ color: "rgb(31 41 55)" }}>
-                  My account
+                <MenuItem
+                  onClick={() => {
+                    navigate("/signUp");
+                    setAnchorEl(null);
+                  }}
+                  sx={{ color: "rgb(31 41 55)" }}
+                >
+                  SignUp
                 </MenuItem>
               </Menu>
             </div>

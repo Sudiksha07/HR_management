@@ -19,14 +19,13 @@ const SignUp = () => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (password === confirmPassword) {
-        console.log('Email:', email);
-        console.log('Password:', password);
+        firebase.signup(email,password);
     } else {
-        console.log('Passwords do not match');
+        alert("Passwords do not match")
     }
 };
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="xs" sx={{marginTop:"20px"}}>
             <Box
                 sx={{
                     marginTop: 8,
@@ -86,7 +85,12 @@ const SignUp = () => {
                     >
                         Sign Up
                     </Button>
-                    <Grid container justifyContent="flex-end">
+                    <Grid container justifyContent="space-around">
+                        <Grid item>
+                            <Link variant="body2" onClick={()=>firebase.signUpWithGoogle()} sx={{cursor:'pointer'}}>
+                                Signup With google
+                            </Link>
+                        </Grid>
                         <Grid item>
                             <Link href="/signin" variant="body2">
                                 Already have an account? Sign in

@@ -21,8 +21,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    const userId = localStorage.getItem("userId");
+    console.log("running auth due to reload")
+    if (userId) {
       setIsAuthenticated(true);
     }
   }, [isAuthenticated]);

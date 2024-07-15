@@ -1,0 +1,33 @@
+.projectsSection {
+  margin-top: 20px;
+}
+
+.projectList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height:320px; 
+  overflow: auto;
+}
+.projectName {
+  background-color: rgb(18, 45, 58);
+  color: black;
+  font-weight: bold;
+  margin: 20px;
+  padding: 10px;
+  height: 200px;
+  border-radius: 20px;
+  background-image: url("/public/images/bg1.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: solid #c0c0c0 1px;
+}
+.employeeList {
+  height: 10px;
+  overflow: auto;
+}
+.deleteAndEditButtons {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px;
+}
