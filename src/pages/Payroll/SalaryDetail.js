@@ -3,15 +3,15 @@ import EmployeeDetail from '../Employee/EmployeeDetail';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { Link, useNavigate } from "react-router-dom";
-import Button from "@mui/material/Button";
-import { useFirebase } from '../../context/Firebase';
+
 
 
 export default function SalaryDetail() {
     const navigate = useNavigate();
-    const firebase = useFirebase();
     const pdfRef = useRef();
      const downloadPDF=()=>{
+        console.log("download")
+        console.log(pdfRef.current)
         const input = pdfRef.current;
         html2canvas(input).then((canvas)=>{
             const imgData=canvas.toDataURL('image/png');
@@ -33,7 +33,7 @@ export default function SalaryDetail() {
       };
   return (
     <div  style={{ width: '100%', padding: '20px', boxSizing: 'border-box' }}>
-    <div ref={firebase.pdfRef} style={{ width: '100%' }}>
+    <div ref={pdfRef} style={{ width: '100%' }}>
         <EmployeeDetail />
     </div>
     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>

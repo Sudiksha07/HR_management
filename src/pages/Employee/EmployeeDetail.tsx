@@ -56,13 +56,12 @@ const EmployeeDetail: React.FC = () => {
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [user] = useAuthState(firebaseAuth);
   const navigate=useNavigate();
-
+  
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
-        if (!user) return;
-
-        const employeeRef = doc(db, `users/${user.uid}/employees/${id}`);
+        const userId=localStorage.getItem('userId')
+        const employeeRef = doc(db, `users/${userId}/employees/${id}`);
         const employeeSnap = await getDoc(employeeRef);
 
         if (employeeSnap.exists()) {
@@ -75,7 +74,6 @@ const EmployeeDetail: React.FC = () => {
         console.error("Error fetching employee:", error);
       }
     };
-
     fetchEmployee();
   }, [id, user]);
 
