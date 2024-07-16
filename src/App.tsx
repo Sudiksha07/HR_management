@@ -20,6 +20,7 @@ import Payroll from "./pages/Payroll";
 import Dashboard from "./pages/Dashboard";
 import LeavePage from "./pages/Attendance/LeavePage";
 import Header from "./Components/Header";
+import SalaryDetail from "./pages/Payroll/SalaryDetail";
 const App: React.FC = () => {
   const { isAuthenticated } = useAuth();
   return (
@@ -62,6 +63,14 @@ const App: React.FC = () => {
               element={
                 <PrivateRoute>
                   <EmployeeDetail />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/salary/:id"
+              element={
+                <PrivateRoute>
+                  <SalaryDetail />
                 </PrivateRoute>
               }
             />

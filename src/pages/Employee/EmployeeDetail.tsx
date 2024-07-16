@@ -5,6 +5,7 @@ import { db, firebaseAuth } from "../../context/Firebase";
 import { getDoc, doc } from "firebase/firestore";
 import { createTheme } from "@mui/material/styles";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -54,6 +55,7 @@ const EmployeeDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [user] = useAuthState(firebaseAuth);
+  const navigate=useNavigate();
 
   useEffect(() => {
     const fetchEmployee = async () => {
@@ -80,7 +82,9 @@ const EmployeeDetail: React.FC = () => {
   if (!employee) {
     return <div>Loading employee details...</div>;
   }
-
+  const back = () => {
+    navigate(`/employees`);
+  };
   return (
     <Container>
       <Title>Employee Detail</Title>
@@ -127,7 +131,7 @@ const EmployeeDetail: React.FC = () => {
               <TableCell>
                 <strong>Salary</strong>
               </TableCell>
-              <TableCell>{employee.Salary}</TableCell>
+              <TableCell>₹{employee.Salary}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

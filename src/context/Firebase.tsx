@@ -4,6 +4,8 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useRef,
+  RefObject
 } from "react";
 import { initializeApp } from "firebase/app";
 import {
@@ -59,6 +61,7 @@ interface FirebaseContextType {
   updateProject: (id: string, formData: any) => Promise<void>;
   markAttendance: (employeeId: string, status: string) => Promise<void>;
   fetchAttendance: (employeeId: string) => Promise<void>;
+  pdfRef:RefObject<HTMLDivElement> | null;
 }
 interface Employee {
   id: string;
@@ -77,6 +80,7 @@ interface Project {
 }
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 const firebaseAuth = getAuth(app);
 const FirebaseContext = createContext<FirebaseContextType | undefined>(
@@ -84,6 +88,7 @@ const FirebaseContext = createContext<FirebaseContextType | undefined>(
 );
 
 export const useFirebase = () => {
+
   const context = useContext(FirebaseContext);
   if (context === undefined) {
     throw new Error("useFirebase must be used within a FirebaseProvider");
@@ -101,6 +106,7 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
   const [userData, setUserData] = useState<any>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const pdfRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchEmployees();
@@ -329,6 +335,7 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
         updateProject,
         markAttendance,
         fetchAttendance,
+        pdfRef,
       }}
     >
       {children}

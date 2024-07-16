@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useFirebase } from "../../context/Firebase";
 import TableContainer from "@mui/material/TableContainer";
@@ -10,6 +10,7 @@ import TableCell from "@mui/material/TableCell";
 import Button from "@mui/material/Button";
 import styled from "styled-components";
 import { createTheme } from "@mui/material/styles";
+import {downloadPDF} from "../../Utility/index"
 
 const theme = createTheme({
   palette: {
@@ -77,8 +78,9 @@ const ButtonContainer = styled.div`
 
 
 const Payroll = () => {
-  const { fetchEmployees, employees } = useFirebase();
+  const { fetchEmployees, employees ,pdfRef} = useFirebase();
   const navigate = useNavigate();
+  // const pdfRef = useRef();
 
   useEffect(() => {
     fetchEmployees();
@@ -88,9 +90,9 @@ const Payroll = () => {
     navigate(`/salary/${employeeId}`);
   };
 
-  const sendByEmail = (employee) => {
-    alert(`Salary details sent to ${employee.email}`);
-  };
+  // const handleDownloadPDF = () => {
+  //   downloadPDF(pdfRef, 'Salary.pdf');
+  // };
 
   return (
     <Container>
@@ -121,9 +123,9 @@ const Payroll = () => {
                     <Button
                       variant="contained"
                       color="secondary"
-                      onClick={() => sendByEmail(employee)}
+                     onClick={()=>downloadPDF(pdfRef)}
                     >
-                      Send by Email
+                      Download
                     </Button>
                   </ButtonContainer>
                 </CustomTableBodyCell>
