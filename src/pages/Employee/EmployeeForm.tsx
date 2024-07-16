@@ -82,7 +82,7 @@ const EmployeeForm: React.FC = () => {
         variant="contained"
         color="primary"
         onClick={handleClickOpen}
-        sx={{ margin: "20px 0px" }}
+        sx={{ margin: "100px 0px 30px 0px" }}
       >
         Add Member
       </Button>

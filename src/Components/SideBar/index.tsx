@@ -67,9 +67,9 @@ const SideBar = () => {
     if (menuItems[id].name == "Logout") {
       localStorage.clear();
       setIsAuthenticated(false);
-      setSelectedItem(1);
+      setSelectedItem(null);
       localStorage.setItem('logout','true')
-      navigate("/signin");
+      navigate("/signIn");
     } 
     else if (menuItems[id].name == "Dashboard") {
       navigate("/");

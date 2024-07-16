@@ -1,12 +1,11 @@
 .dashboard{
-    margin: 0px 30px 0px 250px ;
-    padding: 0px 10px ;
+    margin: 0px 30px 0px 22% ;
     display: flex ;
     justify-content: center ;
     flex-direction: column; 
     align-items: center ;
     overflow:auto;
-    height:60%;
+    max-height:60%;
     
 }
 .mainContent{

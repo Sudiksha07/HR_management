@@ -7,6 +7,7 @@ import { AuthProvider } from "./context/authContext";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { blue, green, red } from "@mui/material/colors"; // Adjust colors as per your theme
+import Header from "./Components/Header";
 
 const theme = createTheme({
   palette: {
@@ -25,7 +26,7 @@ root.render(
       <BrowserRouter>
         <FirebaseProvider>
           <ThemeProvider theme={theme}>
-            <App />
+            <App/>
           </ThemeProvider>
         </FirebaseProvider>
       </BrowserRouter>

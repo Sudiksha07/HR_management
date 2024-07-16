@@ -161,15 +161,6 @@ const Project = () => {
 
   return (
     <div className="projectsSection">
-      <Button
-        variant="contained"
-        onClick={handleOpenAddModal}
-        className="addProject"
-        color="secondary"
-      >
-        Add Project
-      </Button>
-
       <Dialog open={isAddModalOpen} onClose={handleCloseAddModal}>
         <DialogContent>
           <DialogTitle variant="h5">Add Project</DialogTitle>
@@ -374,40 +365,57 @@ const Project = () => {
         </DialogContent>
       </Dialog>
 
-      <h1>Project List </h1>
-      <div className="projectList">
-        {projects.map((project) => (
-          <div key={project.id} className="projectName">
-            <h3>Name: {project.name}</h3>
-            <p>Lead Employee: {project.leadEmployee}</p>
-            <p>
-              Working Employees:{" "}
-              <span className="employeeList">
-                {project.employees.join(", ")}
-              </span>
-            </p>
-            <div className="deleteAndEditButtons">
-              <Button
-                variant="contained"
-                color="error"
-                onClick={() => {
-                  firebase.deleteProject(project.id);
-                  firebase.fetchProjects();
-                }}
-              >
-                Delete
-              </Button>
-              <Button
-                variant="contained"
-                sx={{ backgroundColor: "#06f" }}
-                onClick={() => handleOpenEditModal(project)}
-              >
-                Edit
-              </Button>
-            </div>
-          </div>
-        ))}
+      <div className="buttonAndHeading">
+        <Button
+          variant="contained"
+          onClick={handleOpenAddModal}
+          className="addProject"
+          color="secondary"
+        >
+          Add Project
+        </Button>
+        <h1>Project List </h1>
       </div>
+
+      {projects.length > 0 ? (
+        <div className="projectList">
+          {projects.map((project) => (
+            <div key={project.id} className="projectName">
+              <h3>Name: {project.name}</h3>
+              <p>Lead Employee: {project.leadEmployee}</p>
+              <p>
+                Working Employees:{" "}
+                <span className="employeeList">
+                  {project.employees.join(", ")}
+                </span>
+              </p>
+              <div className="deleteAndEditButtons">
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => {
+                    firebase.deleteProject(project.id);
+                    firebase.fetchProjects();
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ backgroundColor: "#06f" }}
+                  onClick={() => handleOpenEditModal(project)}
+                >
+                  Edit
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div classname="noProjects">
+          <h3>Sorry, there are no projects to show</h3>
+        </div>
+      )}
     </div>
   );
 };

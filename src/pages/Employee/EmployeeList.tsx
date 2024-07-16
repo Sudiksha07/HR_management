@@ -58,8 +58,7 @@ const EmployeeList: React.FC = () => {
 
   const handleDeleteEmployee = async (employeeId: any) => {
     firebase.deleteEmployeeData(employeeId);
-    firebase.fetchEmployees()
-    
+    firebase.fetchEmployees();
   };
 
   const handleOpenDialog = (employee: any) => {
@@ -116,16 +115,11 @@ const EmployeeList: React.FC = () => {
   return (
     <div>
       <EmployeeForm />
-      <Typography variant="h5" sx={{ margin: "20px 0px" }}>
+      <Typography variant="h5" sx={{ margin: "0px 0px" }}>
         Employee List
       </Typography>
-      <TableContainer
-        sx={{
-          maxHeight: "300px",
-          overflow: "auto",
-        }}
-      >
-        <Table>
+      <TableContainer sx={{margin:"20px 0px"}}>
+        <Table sx={{width:"900px"}}>
           <TableHead>
             <TableRow>
               <TableCell>Employee name</TableCell>

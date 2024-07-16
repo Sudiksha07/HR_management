@@ -1,14 +1,15 @@
 .sidebar{
-    position: absolute;
-    top:12%;
-    height:88%;
+    position: fixed;
+    top:12vh;
+    height:88vh;
     left:0;
     background-color: rgb(39 39 42);
-    width: 250px;
+    width: 20vw;
     display: flex;
     justify-content: flex-start;
     flex-direction: column;
     align-items:center;
+    z-index: 1;
 }
 .noSidebar{
     display: none;
@@ -19,7 +20,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    width: 226px;
+    width: 18vw;
 }
 .menuItem{
     color:white;

@@ -1,12 +1,24 @@
 .projectsSection {
-  margin-top: 20px;
+  margin-top: 18vh;
 }
-
+.buttonAndHeading{
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+}
 .projectList {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  height:320px; 
-  overflow: auto;
+}
+.noProjects{
+  height: 500px  !important;
+  background-color: pink !important;
+  margin-top: 100px;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border: solid black 2px;
 }
 .projectName {
   background-color: rgb(18, 45, 58);
