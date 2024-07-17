@@ -101,14 +101,16 @@ const Payroll = () => {
         <Table>
           <CustomTableHeader>
             <TableRow>
+            <CustomTableCell>S.No</CustomTableCell>
               <CustomTableCell>Employee Name</CustomTableCell>
 
               <CustomTableCell>Actions</CustomTableCell>
             </TableRow>
           </CustomTableHeader>
           <TableBody>
-            {employees.map((employee) => (
+            {employees.map((employee,index) => (
               <CustomTableRow key={employee.id}>
+              <CustomTableBodyCell>{index + 1}</CustomTableBodyCell>
                 <CustomTableBodyCell>{employee.name}</CustomTableBodyCell>
 
                 <CustomTableBodyCell>
@@ -120,13 +122,7 @@ const Payroll = () => {
                     >
                       View Details
                     </Button>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                     onClick={()=>downloadPDF(pdfRef)}
-                    >
-                      Download
-                    </Button>
+                    
                   </ButtonContainer>
                 </CustomTableBodyCell>
               </CustomTableRow>
