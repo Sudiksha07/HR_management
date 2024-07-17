@@ -1,17 +1,19 @@
-import { motion, useAnimation, useInView } from "framer-motion";
-import React, { useEffect, useRef } from "react";
+import { motion, useAnimation } from "framer-motion";
+import React, { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 
 const Reveal = ({ children, width = "fit-content" }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+  const { ref, inView } = useInView({ triggerOnce: true });
   const mainControls = useAnimation();
+
   useEffect(() => {
-    if (isInView) {
+    if (inView) {
       mainControls.start("visible");
     }
-  }, [isInView]);
+  }, [inView, mainControls]);
+
   return (
-    <div ref={ref} style={{ position: "relative", width:"100%", overflow: "hidden" }}>
+    <div ref={ref} style={{ position: "relative", width: "100%", overflow: "hidden" }}>
       <motion.div
         variants={{
           hidden: { opacity: 0, y: 75 },
@@ -21,7 +23,7 @@ const Reveal = ({ children, width = "fit-content" }) => {
         animate={mainControls}
         transition={{ duration: 0.5, delay: 0.25 }}
       >
-        {children}{" "}
+        {children}
       </motion.div>
     </div>
   );
