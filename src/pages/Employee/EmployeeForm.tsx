@@ -21,6 +21,7 @@ interface FormData {
   gender: string;
   department: string;
   role: string;
+  Salary:string;
 }
 const initialData:FormData = {
   id: "",
@@ -30,6 +31,7 @@ const initialData:FormData = {
   gender: "",
   department: "",
   role: "",
+  Salary:""
 };
 const departments = ["HR", "Engineering", "Marketing", "Sales"]; // Example departments
 const roles = ["Manager", "Developer", "Designer", "Marketer"]; // Example roles
@@ -121,6 +123,17 @@ const EmployeeForm: React.FC = () => {
               variant="standard"
               name="phoneNumber"
               value={formData.phoneNumber}
+              onChange={handleChange}
+              required
+            />
+            <TextField
+              margin="dense"
+              label="Salary"
+              type="Salary"
+              fullWidth
+              variant="standard"
+              name="Salary"
+              value={formData.Salary}
               onChange={handleChange}
               required
             />
