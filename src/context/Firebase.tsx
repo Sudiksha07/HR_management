@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
   useRef,
-  RefObject
+  RefObject,
 } from "react";
 import { initializeApp } from "firebase/app";
 import {
@@ -61,7 +61,7 @@ interface FirebaseContextType {
   updateProject: (id: string, formData: any) => Promise<void>;
   markAttendance: (employeeId: string, status: string) => Promise<void>;
   fetchAttendance: (employeeId: string) => Promise<void>;
-  pdfRef:RefObject<HTMLDivElement> | null;
+  pdfRef: RefObject<HTMLDivElement> | null;
 }
 interface Employee {
   id: string;
@@ -88,7 +88,6 @@ const FirebaseContext = createContext<FirebaseContextType | undefined>(
 );
 
 export const useFirebase = () => {
-
   const context = useContext(FirebaseContext);
   if (context === undefined) {
     throw new Error("useFirebase must be used within a FirebaseProvider");
@@ -114,8 +113,11 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
 
   const signup = async (email: string, password: string) => {
     createUserWithEmailAndPassword(firebaseAuth, email, password)
-      .then(() => {
+      .then((data) => {
         console.log("Signup successful");
+        console.log("data is:", data);
+        localStorage.setItem("userId", data.user.uid);
+        localStorage.setItem("email", data.user.email ? data.user.email : "");
         setIsAuthenticated(true);
         navigate("/employees");
       })
@@ -130,6 +132,7 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
       .then((result) => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential?.accessToken;
+        console.log("result of signup with google: ", result);
         const user = result.user;
         localStorage.setItem("userId", user.uid);
         localStorage.setItem("email", user.email ? user.email : "");
@@ -161,13 +164,9 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
   };
   const fetchEmployees = async () => {
     try {
+      const userId = localStorage.getItem("userId");
       const querySnapshot = await getDocs(
-        collection(
-          db,
-          "users",
-          localStorage.getItem("userId") || "",
-          "employees"
-        )
+        collection(db, `users/${userId}/employees`)
       );
 
       const employeesData = querySnapshot.docs.map((doc, ID) => ({
@@ -183,13 +182,9 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
 
   const fetchProjects = async () => {
     try {
+      const userId = localStorage.getItem("userId");
       const querySnapshot = await getDocs(
-        collection(
-          db,
-          "users",
-          localStorage.getItem("userId") || "",
-          "projects"
-        )
+        collection(db, `users/${userId}/projects`)
       );
 
       const projectValue = querySnapshot.docs.map((project, ID) => ({
@@ -205,22 +200,15 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
 
   const writeUserData = async (userData: Employee) => {
     try {
-      const docRef = await addDoc(
-        collection(
-          db,
-          "users",
-          localStorage.getItem("userId") || "",
-          "employees"
-        ),
-        {
-          name: userData.name,
-          email: userData.email,
-          phoneNumber: userData.phoneNumber,
-          gender: userData.gender,
-          department: userData.department,
-          role: userData.role,
-        }
-      );
+      const userId = localStorage.getItem("userId");
+      const docRef = await addDoc(collection(db, `users/${userId}/employees`), {
+        name: userData.name,
+        email: userData.email,
+        phoneNumber: userData.phoneNumber,
+        gender: userData.gender,
+        department: userData.department,
+        role: userData.role,
+      });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -277,13 +265,10 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
 
   const markAttendance = async (employeeId: string, status: string) => {
     try {
+      const userId = localStorage.getItem("userId");
+
       const attendanceDoc = await addDoc(
-        collection(
-          db,
-          "users",
-          localStorage.getItem("userId") || "",
-          "attendance"
-        ),
+        collection(db, `users/${userId}/attendance`),
         {
           employeeId,
           status,
@@ -298,18 +283,15 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({
   };
   const fetchAttendance = async (employeeId: string) => {
     try {
+      const userId = localStorage.getItem("userId");
       const querySnapshot = await getDocs(
-        collection(
-          db,
-          "users",
-          localStorage.getItem("userId") || "",
-          "attendance"
-        )
+        collection(db, `users/${userId}/attendance`)
       );
       const attendanceData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as any;
+      console.log("attendance data is: ",attendanceData)
       return attendanceData;
     } catch (error) {
       console.error("Error fetching attendance: ", error);
